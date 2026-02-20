@@ -1,10 +1,15 @@
 sysinternal tools setup
 Recommended workflow for persistence/malware hunt:
+
 Run Autoruns first → identify suspicious autostarts
 Use Process Explorer to inspect those processes live
+
 Fire up ProcMon (with filters) to watch what they do
+
 Check connections with TCPView
+
 enable Sysmon for deeper/long-term logging
+
 Windows Persistence Paths/Locations
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
@@ -27,6 +32,7 @@ C:\Windows\System32\sethc.exe
 C:\Windows\System32\utilman.exe
 C:\Windows\System32\magnify.exe
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System
+
 Linux Persistence Paths/Locations
 /etc/crontab
 /etc/cron.d/
@@ -64,6 +70,7 @@ Linux Persistence Paths/Locations
 /lib/security/
 /etc/passwd
 /etc/shadow
+
 Order of Volatility (from RFC 3227 – collect in this order!)
 Registers, CPU cache
 Routing table, ARP cache, process table, kernel stats, memory (RAM)
@@ -73,6 +80,7 @@ Remote logging and monitoring data
 Physical configuration, network topology
 Archival media (backups, tapes – least volatile)
 Always collect most volatile first to avoid losing evidence.
+
 Windows Persistence & Hunting Commands
 File & Directory Searches
 dir /R → Recursive directory listing
@@ -81,6 +89,7 @@ more < filename → View contents (works on some hidden/alternate streams)
 Alternate Data Streams (ADS):
 echo "hidden data" > normalfile.txt:HiddenInfo.txt
 Get-Content reminder.txt -Stream secret.info
+
 Registry & Boot Config
 Get-Item → View specific registry key + properties
 reg query HKLM\... → Query registry
@@ -90,6 +99,7 @@ bcdedit /export C:\backup\BCD → Backup current BCD
 bcdedit /import C:\backup\BCD → Restore
 bcdedit /deletevalue {current} valuename → Remove value
 MBR boot signature check (on Linux): sudo xxd -l 512 -g 1 /dev/sda
+
 Services & Processes
 Get-CimInstance -ClassName Win32_Service | Select DisplayName → List services
 Get-Service name | Format-List * → Full service details
@@ -101,12 +111,14 @@ netstat -ano → Connections, listening ports, owning PID
 Get-NetTCPConnection -State Established,Listen → Active/listening TCP
 Get-NetTCPConnection | Select LocalPort, RemoteAddress, State, OwningProcess
 Get-Process -Id <PID>
+
 Auto-Start / Run Keys (Persistence at Logon)
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 HKCU\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\RunOnce
 Per-user: HKU<SID>\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
 Services (registry-backed): HKLM\SYSTEM\CurrentControlSet\Services
+
 PowerShell Profiles (Persistence via $PROFILE)
 $PROFILE → Current user's profile script path
 Common profiles:
@@ -115,6 +127,7 @@ AllUsersCurrentHost
 CurrentUserCurrentHost
 CurrentUserAllHost
 Always check profiles — they can run scripts on load.
+
 Other Windows Artifacts
 Prefetch: C:\Windows\Prefetch — First-run evidence
 RecentDocs: HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\RecentDocs
@@ -122,6 +135,7 @@ Jump Lists & AppData\Roaming → Frequent/recent apps & files
 Event Logs: Get-EventLog, Get-WinEvent, wevtutil
 Key IDs: 4103 (verbose cmd), 4104 (script block), 4105/4106 (engine start/stop)
 Auditing: auditpol /get /category:*
+
 Linux Persistence & Hunting Commands
 Boot & Init
 GRUB: /boot/grub/grub.cfg, /boot/grub/x86_64-efi/normal.mod
@@ -136,6 +150,7 @@ sudo lsof -i :<port> → Port → process
 sudo lsof -p <PID> → Open files by PID
 netstat -tulpn → Listening ports + PID/program
 netstat -tulpn | grep -E ':(80|443)' → Suspicious web servers
+
 Logs
 journalctl -e → Recent entries
 journalctl -u ssh.service → Filter by unit
@@ -235,3 +250,5 @@ All cron variants + /etc/crontab
 Shell profiles + .ssh/authorized_keys
 netstat/ss + ps auxf + recent executables in /tmp /dev/shm
 Run these as root/admin. Pipe to | grep -iE "suspicious|http|tcp|127|169|curl|wget|nc|bash|python"
+
+
