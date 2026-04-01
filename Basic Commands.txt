@@ -1,0 +1,135 @@
+Commands
+
+
+date & time	    knowing date and time can help correlate logs and identify target's time zone 
+whoami	            who we are logged in as
+id		    permissions group ( do we have root permissions)
+groups 	            see what groups we are in (are we in the sudoers)
+sudo -l             do we have any binaries that execute with higher privs  
+cat /etc/passwd	    user information
+cat /etc/shadow     user information (need privileged access)
+w                   who is logged in, terminal and what they are doing (tty are direct connections to the pc.. So pts are ssh or telnet connections)
+last                information about users that logged in (user habits, might need to avoid times)
+uptime              how long has the machine been up (would this make for a good pivot)
+hostname            name of machine
+uname -a            kernel information architecture
+cat /etc/*rel*      OS version information
+
+
+Networking Information
+
+ip addr                 info about the network interfaces (IPs, subnets, etc.)
+ifconfig -a             info about the network interfaces (IPs, subnets, etc.) (Depricated)
+cat /etc/hosts          translates hostnames or domain names to ip addresses ( could see a name to another box, might point a target of interest Windows Server )
+cat /etc/resolv.conf    configure dns name servers 
+ss -antp                displays TCP socket information (listening ports and established connections along with process associated with the socket)(-p needs root privs)
+netstat -antp           displays TCP socket information (listening ports and established connections along with process associated with the socket)(-p needs root privs)
+netstat -anup           displays UDP socket information
+netstat -rn             prints routing table
+arp -an                 prints arp table
+
+
+Process Information
+
+ps -ef                                  prints all processes in full-format listing
+ps -auxf 	                        prints all processes in and some other info in different format
+lsof -p [pid] 	                        list of open files opened by the process identified by its pid
+ls -al /proc/[pid]                      list directrory of a specific pid
+service --status-all    	        shows all services and if they are running or not 
+systemctl list-units --type=service     another way to list all services depending on type of linux system
+
+
+
+Logging
+
+cat /etc/rsyslog.conf   default rsyslog config file, check rules and for remote logging 
+/etc/rsyslog.d 		directory where config files are kept we want to check those also.
+/var/log		default location for linux system logs
+
+
+Crontabs
+Why might we want to check Crontabs? What could we take advantage of?
+Crontabs are owned by respective users so you will not be able to see other users crontabs.
+Multiple ways and places to look for cron jobs/scripts.
+
+/var/spool/cron/crontabs
+/etc/cron.d
+ls -la /etc/cron*
+cat /etc/cron*  crontab
+sudo crontab -u student -l
+
+
+
+Finding files and locations to check
+
+find usage examples:
+find / -name password* 2>/dev/null      find any file starting with the word password 
+find / -iname *test* 2>/dev/null        find any file with "test" somewhere in its name, ignoring capitalization
+find / -type f -name *.txt              find all .txt files        
+find / -type f -name ".*"               find all hidden files
+find / -type d -name ".*"               find all hidden directories
+
+
+
+/tmp		check tmp folders (world writable)
+/home	 	check home folders for users
+/etc        default location for config files
+
+
+
+
+HOST ENUMERATION WINDOWS
+
+General Information
+
+Date /t
+Time /t
+Hostname
+Whoami
+systeminfo
+
+User Information
+
+Net user
+Net localgroup
+Net localgroup administrators
+Net use ( if any shares are mapped)
+
+
+Network Information
+
+Ipconfig /all
+Ipconfig /displaydns
+Route print
+Netstat -ant
+Netstat -anob ( need to be admin)
+
+
+Interesting Locations
+
+Explorer - view - hidden items ( turn on show hidden items )
+Check users documents,downloads,desktops
+Dir c:\windows\prefetch ( admin ) = see what executables have been ran
+Dir /a:h
+dir /o:d /t:w c:\windows\system32
+dir /o:d /t:w c:\windows\system32\winevt\logs
+dir /o:d /t:w c:\windows\temp
+reg query hklm\software\microsoft\windows\currentversion\run /s   (don’t forget about hkcu) and runonce
+
+
+Process and Services 
+
+Tasklist /v
+Tasklist /svc
+tasklist /svc | findstr /i "PID"
+
+Services.msc ( gui )
+
+for /f "tokens=2 delims='='" %a in ('wmic service list full^|find /i "pathname"^|find /i /v "system32"') do @echo %a
+Sc query <service name>
+
+Schtasks
+Task sch ( gui )
+schtasks /query /fo LIST /v
+schtasks /query 
+
